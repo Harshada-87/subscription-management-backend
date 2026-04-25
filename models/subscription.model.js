@@ -15,13 +15,14 @@ const subscriptionSchema = new mongoose.Schema(
       min: [0, "Price must be greater than 0"],
     },
     currency: {
-      type: Number,
+      type: String,
       enum: ["USD", "INR", "EUR"],
       default: "USD",
     },
     frequency: {
       type: String,
       enum: ["daily", "weekly", "monthly", "yearly"],
+      required: [true, "Frequency is required"],
     },
     category: {
       type: String,
@@ -73,7 +74,7 @@ const subscriptionSchema = new mongoose.Schema(
 );
 
 // Auto calculate renewal date if missing
-subscriptionSchema.pre("save", function (next) {
+subscriptionSchema.pre("save", async function () {
   if (!this.renewalDate) {
     const renewalPeriods = {
       daily: 1,
@@ -88,12 +89,9 @@ subscriptionSchema.pre("save", function (next) {
     );
   }
 
-  // Auto-update the status if renewal date has passed
   if (this.renewalDate < new Date()) {
     this.status = "expired";
   }
- 
-  next();
 });
 
 const Subscription = mongoose.model("Subscription", subscriptionSchema);
