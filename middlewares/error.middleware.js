@@ -1,10 +1,10 @@
 const errorMiddleware = (err, req, res, next) => {
   try {
-    const error = { ...err };
+    let error = { ...err }; 
     error.message = err.message;
     console.log(err);
 
-    //  1. CastError (Invalid MongoDB ID)
+    // 1. CastError (Invalid MongoDB ID)
     if (err.name === "CastError") {
       const message = "Resource not found";
       error = new Error(message);
